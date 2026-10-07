@@ -1,0 +1,141 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AuraHealth AI</title><meta name="theme-color" content="#0c0a1f"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0c0a1f;--sf:#15122e;--ln:#2a2550;--tx:#ece9ff;--mu:#9b96c8;--cy:#4de1ff;--vi:#b36bff;--pk:#ff4d8d;--am:#ffb23e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.55 Sora,system-ui,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--ln);padding:10px 16px}
+.brand{font-weight:800;font-size:18px;letter-spacing:-.02em}nav{display:flex;gap:6px;overflow-x:auto;margin-top:8px;scrollbar-width:none}
+nav button{flex:none;background:none;border:1px solid var(--ln);color:var(--mu);border-radius:999px;padding:6px 14px;font:inherit;cursor:pointer}
+nav button.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+main{max-width:1000px;margin:0 auto;padding:20px 16px 80px}section{display:none}section.on{display:block}
+h2{font-size:22px;letter-spacing:-.02em;margin:0 0 12px}.card{border:1px solid var(--ln);background:var(--sf);border-radius:14px;padding:16px;margin-bottom:14px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}label{display:block;color:var(--mu);font-size:13px}
+input,select,textarea{width:100%;margin-top:4px;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:8px;padding:9px;font:inherit}
+.chk{display:flex;gap:8px;align-items:center}.chk input{width:auto;margin:0}
+.btn{background:var(--am);color:#1a1200;border:0;border-radius:999px;padding:10px 18px;font:600 14px Sora;cursor:pointer;margin:4px 6px 4px 0}.btn.g{background:none;color:var(--tx);border:1px solid var(--ln)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}.tile b{display:block;font-size:24px;font-variant-numeric:tabular-nums}.tile span{color:var(--mu);font-size:12px}
+.pill{display:inline-block;border:1px solid var(--ln);border-radius:999px;padding:3px 11px;margin:3px;font-size:13px}.ok{border-color:var(--cy);color:var(--cy)}.no{border-color:var(--pk);color:var(--pk)}
+.hero{display:flex;gap:24px;align-items:center;flex-wrap:wrap}.rings{width:230px;height:230px;flex:none}.rings text{fill:var(--tx);font:800 30px Sora}.rings .s{fill:var(--mu);font:12px Sora}
+.msg{padding:10px 13px;border-radius:12px;margin:8px 0;white-space:pre-wrap;max-width:88%}.me{background:var(--vi);color:#14002b;margin-left:auto}.ai{background:var(--bg);border:1px solid var(--ln)}
+#log{max-height:52vh;overflow:auto}#toast{position:fixed;bottom:18px;left:50%;transform:translate(-50%);background:var(--am);color:#1a1200;padding:10px 18px;border-radius:999px;font-weight:600;display:none;z-index:9}
+.big{font-size:56px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}small,.mu{color:var(--mu)}img#pv{max-width:100%;max-height:240px;border-radius:12px;display:none;margin:8px 0}
+@media(prefers-reduced-motion:no-preference){.rings circle{transition:stroke-dasharray .8s ease}}
+</style></head><body>
+<header><div class="brand">AuraHealth AI</div><nav id="nav" aria-label="Sections"></nav></header>
+<main>
+<section id="overview"><h2>Body metrics</h2><div class="card hero"><svg class="rings" viewBox="0 0 200 200" role="img" aria-label="Steps and calories progress">
+<defs><linearGradient id="g1"><stop offset="0" stop-color="#4de1ff"/><stop offset=".5" stop-color="#b36bff"/><stop offset="1" stop-color="#ff4d8d"/></linearGradient><linearGradient id="g2"><stop offset="0" stop-color="#ff4d8d"/><stop offset="1" stop-color="#ffb23e"/></linearGradient></defs>
+<circle cx="100" cy="100" r="90" fill="none" stroke="#2a2550" stroke-width="12"/><circle id="r1" cx="100" cy="100" r="90" fill="none" stroke="url(#g1)" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 999" transform="rotate(-90 100 100)"/>
+<circle cx="100" cy="100" r="68" fill="none" stroke="#2a2550" stroke-width="12"/><circle id="r2" cx="100" cy="100" r="68" fill="none" stroke="url(#g2)" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 999" transform="rotate(-90 100 100)"/>
+<text id="rt" x="100" y="106" text-anchor="middle">0</text><text class="s" x="100" y="126" text-anchor="middle">steps today</text></svg>
+<div style="flex:1;min-width:220px"><div class="tiles" id="tiles"></div><p class="mu">Outer ring: steps toward 10,000. Inner ring: calories eaten toward your target.</p></div></div>
+<div class="card"><div class="grid" id="form"></div><button class="btn" id="save">Calculate</button><small> Estimates only, not medical advice. Calorie targets never drop below 1,200 (women) or 1,500 (men) kcal.</small></div></section>
+<section id="nutrition"><h2>Dietary prescription</h2><div class="card" id="macros"></div><div class="card"><b>Foods to eat</b><div id="eat"></div></div><div class="card"><b>Foods to avoid</b><div id="avoid"></div></div></section>
+<section id="training"><h2>Training optimizer</h2><div class="card" id="plan"></div></section>
+<section id="tracker"><h2>Live steps and calories</h2><div class="card"><div class="big" id="st">0</div><p><span id="kc">0</span> active kcal · stride <span id="sl"></span> m</p>
+<button class="btn" id="sens">Start motion sensor</button><button class="btn g" id="add">+100 steps</button><button class="btn g" id="rst">Reset today</button><p class="mu">Motion counting is approximate and works best with the phone in a pocket. HealthKit and Health Connect need the native app or the fullstack bridge.</p></div></section>
+<section id="progress"><h2>Progress and recovery</h2><div class="grid"><div class="card"><b>Water</b><p><span id="wtr">0</span> / <span id="wg"></span> ml</p><progress id="wp" max="1" value="0" style="width:100%"></progress><button class="btn" id="w250">+250 ml</button><button class="btn g" id="w0">Reset</button></div>
+<div class="card"><b>Sleep last night</b><label>Hours<input id="slin" type="number" step="0.5" min="0" max="14"></label><button class="btn" id="slsv">Save</button><p id="rec" class="mu"></p></div>
+<div class="card"><b>Weight</b><label>Today in kg<input id="wi" type="number" step="0.1"></label><button class="btn" id="wsv">Log weight</button></div></div>
+<div class="card"><b>Steps, last 7 days</b><canvas id="cw" width="600" height="170" style="width:100%;height:auto"></canvas></div><div class="card"><b>Weight trend</b><canvas id="cwt" width="600" height="170" style="width:100%;height:auto"></canvas></div><div class="card"><b>Streaks and badges</b><p id="stk"></p></div></section>
+<section id="scan"><h2>Food scan (CNN + RAG)</h2><div class="card"><p class="mu">MobileNetV2 (TensorFlow.js, runs on your device) names the food, then retrieval over the nutrition database matches it to macros and checks your eat/avoid lists. It recognises common foods best; confirm the match and portion before logging.</p>
+<input type="file" id="file" accept="image/*" capture="environment"><img id="pv" alt="Meal preview"><div id="res"></div></div><div class="card"><b>Today's meals</b><div id="meals"></div></div></section>
+<section id="coach"><h2>Agent coach</h2><div class="card"><p class="mu">Three agents (nutritionist, fitness, motivation) read your data in parallel, then a synthesizer merges their advice. Add a Groq key in Settings for LLM agents; without it, rule-based agents run offline.</p><button class="btn" id="brief">Generate daily briefing</button><div id="bo"></div></div></section>
+<section id="chat"><h2>Personal assistant</h2><div class="card"><div id="log" aria-live="polite"></div><div style="display:flex;gap:8px"><input id="q" placeholder="Ask, or say: remember I have a knee injury" autocomplete="off"><button class="btn" id="send">Send</button></div></div>
+<div class="card"><b>Episodic memory</b> <small>(stored only in this browser)</small><div id="mem"></div></div></section>
+<section id="settings"><h2>Settings</h2><div class="card"><label>Groq API key (free at console.groq.com), stored only in this browser<input id="key" type="password" placeholder="gsk_..." autocomplete="off"></label><button class="btn" id="sk">Save key</button><button class="btn g" id="ex">Export my data</button><button class="btn g" id="wipe">Erase all data</button>
+<p class="mu">The key is sent only to api.groq.com. Anyone with access to this browser profile can read it, so use a key you can revoke.</p></div></section>
+</main><div id="toast" role="status"></div>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0"></script><script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1"></script>
+<script>
+const $=s=>document.querySelector(s),ls=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},sv=(k,v)=>localStorage.setItem(k,JSON.stringify(v)),td=()=>new Date().toISOString().slice(0,10),r0=x=>Number.isFinite(x)?Math.round(x):'-';
+const ACT={sedentary:1.2,light:1.375,moderate:1.55,high:1.725,athlete:1.9},ADJ={fat:-.25,bulk:.1,recomp:-.05,maint:0},PROT={fat:2.4,bulk:2,recomp:2.2,maint:1.8};
+// name,kcal/100g,protein,carb,fat,GI,allergens,aliases,serving g
+const FOODS=[["Oats porridge",68,2.4,12,1.4,55,"gluten","oatmeal oats breakfast porridge",250],["Dal lentil curry",116,9,20,0.4,32,"","dal lentils soup stew curry consomme",200],["Chicken breast grilled",165,31,0,3.6,0,"","chicken meat poultry",150],["Egg omelette",154,11,1,12,0,"egg","omelette egg scrambled eggs",100],["Greek yogurt curd",59,10,3.6,0.4,11,"dairy","yogurt curd dahi",150],["Paneer",265,18,1.2,21,27,"dairy","paneer cheese cottage",100],["White rice cooked",130,2.7,28,0.3,73,"","rice biryani pilaf",180],["Chapati roti",297,9,46,7,52,"gluten","roti chapati flatbread bread",40],["Idli",132,4,26,0.5,69,"","idli steamed cake",120],["Dosa",168,4,29,4,77,"","dosa pancake crepe",100],["Banana",89,1.1,23,0.3,51,"","banana fruit",120],["Apple",52,0.3,14,0.2,36,"","apple granny smith fruit",180],["Orange",47,0.9,12,0.1,43,"","orange fruit citrus",130],["Broccoli",34,2.8,7,0.4,15,"","broccoli cauliflower vegetable greens",100],["Salad greens",20,1.5,3.5,0.2,15,"","salad greens lettuce cucumber vegetable",150],["Almonds",579,21,22,50,15,"nuts","almonds nuts",28],["Salmon grilled",208,20,0,13,0,"fish","salmon fish seafood",120],["Pizza",266,11,33,10,60,"gluten dairy","pizza pizzeria fast food cheese",120],["Cheeseburger",295,17,24,14,66,"gluten dairy","cheeseburger hamburger burger fast food",150],["French fries",312,3.4,41,15,75,"","french fries chips potato fried",100],["Ice cream",207,3.5,24,11,62,"dairy","ice cream dessert sweet",100],["Bagel white bread",250,10,49,1.5,72,"gluten","bagel bread loaf pretzel french loaf toast",90],["Sugary drink",42,0,10.6,0,90,"","soda cola sweet drink juice espresso",330],["Mashed potato",88,1.9,15,2.5,83,"dairy","mashed potato",150]];
+const $$=s=>[...document.querySelectorAll(s)],TABS=[["overview","Overview"],["nutrition","Nutrition"],["training","Training"],["tracker","Tracker"],["progress","Progress"],["scan","Food scan"],["coach","Agent coach"],["chat","Assistant"],["settings","Settings"]];
+$("#nav").innerHTML=TABS.map(t=>`<button data-t="${t[0]}">${t[1]}</button>`).join("");
+const show=t=>{$$("section").forEach(s=>s.classList.toggle("on",s.id==t));$$("nav button").forEach(b=>b.classList.toggle("on",b.dataset.t==t))};$$("nav button").forEach(b=>b.onclick=()=>show(b.dataset.t));show("overview");
+const toast=m=>{const t=$("#toast");t.textContent=m;t.style.display="block";navigator.vibrate?.(80);clearTimeout(toast.i);toast.i=setTimeout(()=>t.style.display="none",3000)};
+// ---- profile + calculators
+const F=[["sex","Sex",["m:Male","f:Female"]],["age","Age"],["w","Weight kg"],["h","Height cm"],["neck","Neck cm"],["waist","Waist cm"],["hip","Hip cm (women)"],["act","Activity",Object.keys(ACT).map(k=>k+":"+k)],["goal","Goal",["fat:Aggressive fat loss","bulk:Lean bulk","recomp:Recomposition","maint:Maintenance"]],["level","Training level",["beginner:Beginner","intermediate:Intermediate","advanced:Advanced"]],["alg","Allergies (comma separated)"]];
+let P={sex:"m",age:22,w:70,h:172,neck:36,waist:82,hip:90,act:"moderate",goal:"recomp",level:"beginner",alg:"",ins:false,...ls("aura.p",{})};
+$("#form").innerHTML=F.map(([k,l,o])=>`<label>${l}${o?`<select id="f_${k}">${o.map(x=>{const[v,t]=x.split(":");return`<option value="${v}">${t}</option>`}).join("")}</select>`:`<input id="f_${k}" ${k=="alg"?"":'type="number" step="any"'}>`}</label>`).join("")+'<label class="chk"><input type="checkbox" id="f_ins"> Insulin-sensitive or prediabetic diet</label>';
+const fill=()=>{F.forEach(([k])=>$("#f_"+k).value=P[k]);$("#f_ins").checked=P.ins};fill();
+const calc=p=>{const bmr=10*p.w+6.25*p.h-5*p.age+(p.sex=="m"?5:-161),tdee=bmr*ACT[p.act],t=Math.max(tdee*(1+ADJ[p.goal]),p.sex=="m"?1500:1200),hi=p.h/2.54,n=p.neck/2.54,w=p.waist/2.54;
+let bf=p.sex=="m"?495/(1.0324-.19077*Math.log10(w-n)+.15456*Math.log10(hi))-450:495/(1.29579-.35004*Math.log10(w+(p.hip||p.waist)/2.54-n)+.221*Math.log10(hi))-450;bf=Number.isFinite(bf)?Math.min(60,Math.max(2,bf)):NaN;
+const pr=PROT[p.goal]*p.w,fat=.25*t/9;return{bmi:p.w/(p.h/100)**2,bmr,tdee,t,bf,lbm:p.w*(1-bf/100),pr,fat,carb:Math.max(0,(t-pr*4-fat*9)/4)}};
+const gi=()=>P.ins||P.goal=="fat"?55:70,algs=()=>P.alg.toLowerCase().split(",").map(s=>s.trim()).filter(Boolean);
+const verdict=f=>{const a=f[6].split(" ").filter(x=>algs().includes(x));return a.length?["no","allergen: "+a.join(", ")]:f[5]>gi()?["no","GI "+f[5]+" is above "+gi()]:["ok","GI "+f[5]]};
+// ---- daily data
+const day=()=>({steps:0,meals:[],water:0,sleep:0,...ls("aura.d."+td(),{})}),saveDay=d=>sv("aura.d."+td(),d),stride=()=>P.h*.415/100,kps=()=>.5*P.w*stride()/1000;
+const eaten=()=>day().meals.reduce((a,m)=>({k:a.k+m.k,p:a.p+m.p,c:a.c+m.c,f:a.f+m.f}),{k:0,p:0,c:0,f:0});
+function render(){const c=calc(P),d=day(),e=eaten();
+$("#tiles").innerHTML=[["BMI",c.bmi.toFixed(1)],["BMR kcal",r0(c.bmr)],["TDEE kcal",r0(c.tdee)],["Target kcal",r0(c.t)],["Body fat %",Number.isFinite(c.bf)?c.bf.toFixed(1):"-"],["Lean kg",Number.isFinite(c.lbm)?c.lbm.toFixed(1):"-"]].map(([l,v])=>`<div class="tile"><b>${v}</b><span>${l}</span></div>`).join("");
+const arc=(id,r,f)=>$(id).setAttribute("stroke-dasharray",`${Math.min(1,f)*2*Math.PI*r} 999`);arc("#r1",90,d.steps/1e4);arc("#r2",68,e.k/c.t);$("#rt").textContent=d.steps.toLocaleString();
+$("#macros").innerHTML=`<div class="tiles"><div class="tile"><b>${r0(c.t)}</b><span>kcal target</span></div><div class="tile"><b>${r0(c.pr)} g</b><span>protein (${r0(e.p)} eaten)</span></div><div class="tile"><b>${r0(c.carb)} g</b><span>carbs (${r0(e.c)} eaten)</span></div><div class="tile"><b>${r0(c.fat)} g</b><span>fat (${r0(e.f)} eaten)</span></div></div><p class="mu">GI ceiling ${gi()} for your profile.</p>`;
+$("#eat").innerHTML=FOODS.filter(f=>verdict(f)[0]=="ok").map(f=>`<span class="pill ok">${f[0]}</span>`).join("");$("#avoid").innerHTML=FOODS.filter(f=>verdict(f)[0]=="no").map(f=>`<span class="pill no" title="${verdict(f)[1]}">${f[0]} · ${verdict(f)[1]}</span>`).join("");
+const L={beginner:["150 min/week","none for the first 4 weeks","3 full-body sessions, add weight or reps every 1-2 weeks"],intermediate:["180 min/week","1 session: 8 x 30 s hard / 90 s easy","4 sessions upper/lower, double progression"],advanced:["200 min/week","2 sessions: 6 x 1 min hard / 2 min easy","5 sessions push/pull/legs, RPE-based overload"]}[P.level],z=[(220-P.age)*.6,(220-P.age)*.7].map(Math.round);
+$("#plan").innerHTML=`<p><b>Zone 2 cardio:</b> ${L[0]} at about ${z[0]}-${z[1]} bpm (conversational pace).</p><p><b>HIIT:</b> ${L[1]}${P.goal=="bulk"?" (cap at 1 per week to protect recovery)":""}.</p><p><b>Progressive overload:</b> ${L[2]}.</p><p><b>Intermittent fasting window:</b> ${P.level=="beginner"?"14:10":"16:8"}, optional. Skip it if you are under 18, pregnant, or have a history of disordered eating.</p>`;
+$("#st").textContent=d.steps.toLocaleString();$("#kc").textContent=(d.steps*kps()).toFixed(0);$("#sl").textContent=stride().toFixed(2);
+$("#meals").innerHTML=d.meals.map((m,i)=>`<p>${m.n} · ${m.g} g · ${m.k} kcal <button class="btn g" data-i="${i}">Remove</button></p>`).join("")||'<p class="mu">Nothing logged yet. Scan a meal to start.</p>';
+$$("#meals button").forEach(b=>b.onclick=()=>{const d=day();d.meals.splice(+b.dataset.i,1);saveDay(d);render()})}
+$("#save").onclick=()=>{F.forEach(([k])=>P[k]=$("#f_"+k).tagName=="SELECT"||k=="alg"?$("#f_"+k).value:parseFloat($("#f_"+k).value)||0);P.ins=$("#f_ins").checked;sv("aura.p",P);render();toast("Profile updated")};
+const addSteps=n=>{const d=day(),b=Math.floor(d.steps/1e3);d.steps+=n;saveDay(d);const a=Math.floor(d.steps/1e3);if(a>b)toast(`${a*1000} steps reached`);render()};
+$("#add").onclick=()=>addSteps(100);$("#rst").onclick=()=>{const d=day();d.steps=0;saveDay(d);render()};
+let last=0;$("#sens").onclick=async()=>{try{if(typeof DeviceMotionEvent!="undefined"&&DeviceMotionEvent.requestPermission&&await DeviceMotionEvent.requestPermission()!="granted")return toast("Motion permission denied");
+addEventListener("devicemotion",e=>{const a=e.accelerationIncludingGravity;if(!a)return;const m=Math.hypot(a.x,a.y,a.z),t=Date.now();if(m>12&&t-last>300){last=t;addSteps(1)}});$("#sens").textContent="Sensor running"}catch{toast("Motion sensor unavailable")}};
+// ---- RAG (TF-IDF cosine, fully local)
+const tok=s=>s.toLowerCase().match(/[a-z]+/g)||[];
+function rank(texts,q,k=3){const D=texts.map(tok),df={};D.forEach(d=>new Set(d).forEach(t=>df[t]=(df[t]||0)+1));const N=texts.length||1,v=ts=>{const o={};ts.forEach(t=>o[t]=(o[t]||0)+1);for(const t in o)o[t]*=Math.log(1+N/(df[t]||.5));return o},qv=v(tok(q)),nq=Math.sqrt(Object.values(qv).reduce((a,x)=>a+x*x,0))||1;
+return D.map((d,i)=>{const dv=v(d);let dot=0,nd=0;for(const t in dv){nd+=dv[t]**2;if(qv[t])dot+=dv[t]*qv[t]}return{i,s:dot/(nq*(Math.sqrt(nd)||1))}}).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).slice(0,k)}
+const foodRag=(q,k=3)=>rank(FOODS.map(f=>f[0]+" "+f[7]+" "+f[0]),q,k).map(x=>({f:FOODS[x.i],s:x.s}));
+// ---- CNN scan
+let net,cur;$("#file").onchange=async e=>{const file=e.target.files[0];if(!file)return;const img=$("#pv");img.src=URL.createObjectURL(file);img.style.display="block";await img.decode();$("#res").innerHTML='<p class="mu">Loading vision model, first run downloads about 14 MB…</p>';
+try{net??=await mobilenet.load({version:2,alpha:1});const pr=await net.classify(img,5);const hits=pr.map(p=>({p,m:foodRag(p.className,1)[0]})).filter(x=>x.m);
+if(!hits.length)return $("#res").innerHTML=`<p>No food in the database matched (top guess: ${pr[0].className}). Try a closer photo of a single dish.</p>`;
+cur=hits[0];const f=cur.m.f,v=verdict(f);$("#res").innerHTML=`<p><b>${f[0]}</b> <small>CNN: ${cur.p.className} (${Math.round(cur.p.probability*100)}%)</small></p><p><span class="pill ${v[0]}">${v[0]=="ok"?"Fits your plan":"Avoid"} · ${v[1]}</span></p><label>Portion: <span id="gv">${f[8]}</span> g<input type="range" id="gr" min="20" max="600" step="10" value="${f[8]}"></label><p id="mac" class="mu"></p><button class="btn" id="lg">Log meal</button>`;
+const up=()=>{const g=+$("#gr").value;$("#gv").textContent=g;$("#mac").textContent=`${r0(f[1]*g/100)} kcal · P ${r0(f[2]*g/100)} g · C ${r0(f[3]*g/100)} g · F ${r0(f[4]*g/100)} g`};up();$("#gr").oninput=up;
+$("#lg").onclick=()=>{const g=+$("#gr").value,k=g/100,d=day();d.meals.push({n:f[0],g,k:r0(f[1]*k),p:f[2]*k,c:f[3]*k,f:f[4]*k});saveDay(d);render();toast("Meal logged")}}catch(err){$("#res").innerHTML='<p>The vision model could not load. Check your connection and retry.</p>'}};
+// ---- LLM (Groq, bring your own key) + agents
+async function llm(system,msgs){const k=ls("aura.key","");if(!k)return null;try{const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+k},body:JSON.stringify({model:"llama-3.3-70b-versatile",temperature:.4,max_tokens:450,messages:[{role:"system",content:system},...msgs]})});if(!r.ok)throw 0;return(await r.json()).choices[0].message.content}catch{return null}}
+const SAFE=" You are not a doctor: give general wellness guidance only, never diagnose, and suggest a clinician for symptoms, injuries, pregnancy, or eating-disorder concerns.";
+const ctx=()=>{const c=calc(P),d=day(),e=eaten();return`Profile: ${P.sex=="m"?"male":"female"}, ${P.age}y, ${P.w}kg, ${P.h}cm, goal ${P.goal}, level ${P.level}, allergies ${P.alg||"none"}. Targets: ${r0(c.t)} kcal, protein ${r0(c.pr)}g. Today: ${d.steps} steps, sleep ${d.sleep||"unlogged"}h, water ${d.water} ml, ${r0(e.k)} kcal eaten, protein ${r0(e.p)}g.`};
+const AG={nutritionist:["You are the Clinical Nutritionist agent. Give 2 concrete food actions for today using the data."+SAFE,()=>{const c=calc(P),e=eaten();return`${r0(c.t-e.k)} kcal and ${r0(Math.max(0,c.pr-e.p))} g protein remain. Favour: ${FOODS.filter(f=>verdict(f)[0]=="ok"&&f[2]>=9).slice(0,3).map(f=>f[0]).join(", ")}.`}],
+fitness:["You are the Fitness Coach agent. Give today's session in 2 sentences using the data."+SAFE,()=>day().sleep&&day().sleep<6?"Short sleep: keep today to Zone 2 or a light deload. Recovery comes first.":day().steps<4e3?"Low movement so far: add a 30-minute Zone 2 walk, then your planned strength work.":"Movement is on track: do your planned strength session and add one rep or a little load."],
+motivation:["You are the Motivation agent. Write 2 warm, specific sentences, no hype."+SAFE,()=>`You are ${1000-day().steps%1000} steps from the next milestone. Small wins compound.`]};
+$("#brief").onclick=async()=>{$("#bo").innerHTML='<p class="mu">Agents working…</p>';const c=ctx(),names=Object.keys(AG),out=await Promise.all(names.map(async n=>await llm(AG[n][0],[{role:"user",content:c}])||AG[n][1]()));
+const syn=await llm("Merge these three agent notes into one briefing of at most 5 short bullet lines. No medical claims."+SAFE,[{role:"user",content:out.join("\n")}]);
+$("#bo").innerHTML=names.map((n,i)=>`<div class="card"><b>${n}</b><p class="ai-t"></p></div>`).join("")+`<div class="card"><b>Daily briefing</b><p id="sy" style="white-space:pre-wrap"></p></div>`;$$(".ai-t").forEach((p,i)=>p.textContent=out[i]);$("#sy").textContent=syn||out.join("\n")}
+// ---- assistant with episodic memory
+const mem=()=>ls("aura.m",[]),MEMRE=/\b(remember|my goal|i('m| am) (allergic|vegetarian|vegan)|i (injured|hurt|prefer|can't|cannot|don't eat|do not eat|have a)|injury|i usually)\b/i;
+function drawMem(){$("#mem").innerHTML=mem().map((m,i)=>`<p>${"" }<span class="pill"></span><button class="btn g" data-i="${i}">Forget</button></p>`).join("")||'<p class="mu">No memories yet.</p>';$$("#mem p").forEach((p,i)=>p.querySelector(".pill").textContent=mem()[i].t);$$("#mem button").forEach(b=>b.onclick=()=>{const m=mem();m.splice(+b.dataset.i,1);sv("aura.m",m);drawMem()})}
+const bubble=(t,c)=>{const d=document.createElement("div");d.className="msg "+c;d.textContent=t;$("#log").append(d);$("#log").scrollTop=1e9};
+async function ask(){const q=$("#q").value.trim();if(!q)return;$("#q").value="";bubble(q,"me");if(MEMRE.test(q)){const m=mem();m.push({t:q.replace(/^remember( that)?/i,"").trim()||q,d:td()});sv("aura.m",m.slice(-60));drawMem()}
+const M=mem(),rel=rank(M.map(x=>x.t),q,4).map(x=>M[x.i].t),facts=foodRag(q,3).map(x=>`${x.f[0]}: ${x.f[1]} kcal, P${x.f[2]} C${x.f[3]} F${x.f[4]} per 100g, GI ${x.f[5]}`),hist=ls("aura.h",[]).slice(-8);
+const sys="You are Aura, a concise, friendly health and fitness assistant. "+ctx()+" Long-term memories: "+(rel.join("; ")||"none")+". Nutrition database matches: "+(facts.join(" | ")||"none")+"."+SAFE;
+bubble("…","ai");let a=await llm(sys,[...hist,{role:"user",content:q}]);
+if(!a){const c=calc(P);a=facts.length?"From the nutrition database: "+facts[0]+".":/calorie|tdee|bmr|target/i.test(q)?`Your target is about ${r0(c.t)} kcal a day (TDEE ${r0(c.tdee)}).`:"I can answer food and metrics questions offline. Add a Groq key in Settings for full conversations.";if(rel.length)a+="\nI remember: "+rel[0]}
+$("#log").lastChild.textContent=a;const h=[...hist,{role:"user",content:q},{role:"assistant",content:a}].slice(-12);sv("aura.h",h)}
+$("#send").onclick=ask;$("#q").onkeydown=e=>e.key=="Enter"&&ask();
+// ---- settings
+$("#key").value=ls("aura.key","");$("#sk").onclick=()=>{sv("aura.key",$("#key").value.trim());toast("Key saved on this device")};
+$("#ex").onclick=()=>{const o={};for(const k in localStorage)if(k.startsWith("aura.")&&k!="aura.key")o[k]=ls(k);const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(o,null,2)],{type:"application/json"}));a.download="aura-data.json";a.click()};
+$("#wipe").onclick=()=>{if(confirm("Erase all AuraHealth data on this device?")){Object.keys(localStorage).filter(k=>k.startsWith("aura.")).forEach(k=>localStorage.removeItem(k));location.reload()}};
+const lastDays=n=>Array.from({length:n},(_,i)=>{const t=new Date(Date.now()-(n-1-i)*864e5).toISOString().slice(0,10);return{t,d:{steps:0,meals:[],...ls("aura.d."+t,{})}}});
+function chart(id,vals,labels,line){const c=$(id),x=c.getContext("2d"),W=c.width,H=c.height,mx=Math.max(...vals,1),mn=line?Math.min(...vals)-1:0,rg=mx-mn||1,n=vals.length,sx=(W-60)/Math.max(n-(line?1:0),1),y=v=>H-24-(v-mn)/rg*(H-44);x.clearRect(0,0,W,H);x.font="12px Sora";x.lineWidth=3;x.strokeStyle="#b36bff";
+if(line){x.beginPath();vals.forEach((v,i)=>i?x.lineTo(30+i*sx,y(v)):x.moveTo(30,y(v)));x.stroke();x.fillStyle="#9b96c8";vals.forEach((v,i)=>x.fillText(v,30+i*sx-8,y(v)-8))}
+else vals.forEach((v,i)=>{x.fillStyle="#ffb23e";x.fillRect(30+i*sx+sx*.2,y(v),sx*.6,H-24-y(v));x.fillStyle="#9b96c8";x.fillText(labels[i],30+i*sx+sx*.2,H-6)})}
+function renderProg(){const d=day(),g=P.w*35;$("#wtr").textContent=d.water;$("#wg").textContent=r0(g);$("#wp").value=Math.min(1,d.water/g);$("#slin").value=d.sleep||"";
+$("#rec").textContent=d.sleep?`Recovery ${Math.min(100,r0(d.sleep/8*100))}%. ${d.sleep<6?"Keep training light today.":"You are clear for your planned session."}`:"Log last night's sleep to get a recovery score.";
+const L=lastDays(7);chart("#cw",L.map(x=>x.d.steps),L.map(x=>x.t.slice(8)),false);const Wt=ls("aura.wt",[]).slice(-10);if(Wt.length)chart("#cwt",Wt.map(x=>x.w),[],true);
+const L30=lastDays(30).reverse();let k=0,i=L30[0].d.steps>=5000?0:1;for(;i<L30.length&&L30[i].d.steps>=5000;i++)k++;
+const b=[k?`${k}-day streak (5,000+ steps)`:"No streak yet: reach 5,000 steps today",d.steps>=1e4&&"10k steps",d.water>=g&&"Hydration goal",d.sleep>=7&&"Well rested"].filter(Boolean);$("#stk").innerHTML=b.map(t=>`<span class="pill ok">${t}</span>`).join("")}
+$("#w250").onclick=()=>{const d=day(),g=P.w*35;d.water+=250;saveDay(d);renderProg();if(d.water>=g&&d.water-250<g)toast("Hydration goal reached")};
+$("#w0").onclick=()=>{const d=day();d.water=0;saveDay(d);renderProg()};
+$("#slsv").onclick=()=>{const d=day();d.sleep=Math.min(14,Math.max(0,parseFloat($("#slin").value)||0));saveDay(d);renderProg();toast("Sleep saved")};
+$("#wsv").onclick=()=>{const v=parseFloat($("#wi").value);if(!v)return;const a=ls("aura.wt",[]).filter(x=>x.d!=td());a.push({d:td(),w:v});sv("aura.wt",a);P.w=v;sv("aura.p",P);fill();render();toast("Weight logged")};
+const _r=render;render=function(){_r();renderProg()};
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+bubble("Hi, I'm Aura. Ask about food, training or your numbers. Tell me things like “remember I prefer vegetarian meals” and I'll keep them in mind.","ai");drawMem();render();
+</script></body></html>

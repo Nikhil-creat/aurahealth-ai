@@ -1,0 +1,38 @@
+services:
+  frontend:
+    build: {context: ./frontend, target: runner}
+    ports: ["3000:3000"]
+    environment: [NEXT_PUBLIC_API_URL=http://localhost:8000, NEXT_PUBLIC_SYNC_URL=http://localhost:4000]
+    depends_on: [api]
+  api:
+    build: {context: ./backend, target: runtime}
+    env_file: .env
+    ports: ["8000:8000"]
+    depends_on: [postgres, redis, chroma]
+    healthcheck:
+      test: ["CMD","python","-c","import urllib.request as u;u.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+  postgres:
+    image: postgres:16-alpine
+    environment: {POSTGRES_USER: aura, POSTGRES_PASSWORD: "${PG_PASSWORD}", POSTGRES_DB: aura}
+    volumes: [pg:/var/lib/postgresql/data]
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server","--requirepass","${REDIS_PASSWORD}"]
+  chroma:
+    image: chromadb/chroma:latest
+    volumes: [chroma:/chroma/chroma]
+  sync:
+    build: ./sync
+    environment: [PG_PASSWORD=${PG_PASSWORD}, JWT_SECRET=${JWT_SECRET}]
+    ports: ["4000:4000"]
+    depends_on: [postgres]
+  prometheus:
+    image: prom/prometheus
+    volumes: ["./infra/prometheus.yml:/etc/prometheus/prometheus.yml:ro"]
+    ports: ["9090:9090"]
+  grafana:
+    image: grafana/grafana
+    ports: ["3001:3000"]
+    volumes: ["./infra/grafana:/etc/grafana/provisioning:ro"]
+volumes: {pg: {}, chroma: {}}

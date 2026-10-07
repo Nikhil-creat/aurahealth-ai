@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+pydantic>=2
+prometheus-fastapi-instrumentator
+chromadb-client
+python-multipart
+pillow
+langgraph
+PyJWT
